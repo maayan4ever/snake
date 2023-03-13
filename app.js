@@ -10,12 +10,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const startBtn = document.querySelector(".start");
 
   let currentSnake = [2, 1, 0];
+  let appleIndex = 0;
   let direction = 1;
   let intervalTime = 1000;
   let interval = 0;
 
+  function clearGame() {
+    currentSnake.forEach((index) => squares[index].classList.remove("snake"));
+    currentSnake = [2, 1, 0];
+    squares[appleIndex].classList.remove("apple");
+    stop();
+  }
+
   function startGame() {
+    clearGame();
     currentSnake.forEach((index) => squares[index].classList.add("snake"));
+    randomApple();
     interval = setInterval(() => {
       move();
     }, intervalTime);
@@ -41,6 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     currentSnake.unshift(nextHead);
     squares[currentSnake[0]].classList.add("snake");
+
+    handleEatingApple(tail);
   }
 
   function control(event) {
@@ -53,6 +65,22 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (event.keyCode === 40) {
       direction = DOWN;
     }
+  }
+
+  function handleEatingApple(tail) {
+    if (squares[currentSnake[0]].classList.contains("apple")) {
+      squares[currentSnake[0]].classList.remove("apple");
+      squares[tail].classList.add("snake");
+      currentSnake.push(tail);
+      randomApple();
+    }
+  }
+
+  function randomApple() {
+    do {
+      appleIndex = Math.floor(Math.random() * squares.length);
+    } while (squares[appleIndex].classList.contains("snake"));
+    squares[appleIndex].classList.add("apple");
   }
 
   startBtn.addEventListener("click", startGame);
