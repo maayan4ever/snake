@@ -4,6 +4,13 @@ const LEFT = -1;
 const UP = -WIDTH;
 const DOWN = WIDTH;
 
+// TODO:
+// 1. Show the game over on the screen
+// 2. Deploy the game on the web
+// 3. Adapt the game to mobile devices
+// 4. Add some sound effects
+// 5. Add a high scores list
+
 document.addEventListener("DOMContentLoaded", () => {
   const squares = document.querySelectorAll(".grid div");
   const scoreDisplay = document.querySelector(".score span");
@@ -12,7 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentSnake = [2, 1, 0];
   let appleIndex = 0;
   let direction = 1;
-  let intervalTime = 1000;
+  let intervalTime = 800;
+  let speed = 0.9;
   let interval = 0;
   let score = 0;
 
@@ -28,13 +36,23 @@ document.addEventListener("DOMContentLoaded", () => {
     clearGame();
     currentSnake.forEach((index) => squares[index].classList.add("snake"));
     randomApple();
-    interval = setInterval(() => {
-      move();
-    }, intervalTime);
+    setGameInterval();
   }
 
   function stop() {
     if (interval) clearInterval(interval);
+  }
+
+  function endGame() {
+    stop();
+    alert(`Game Over! Your score is ${score}`);
+  }
+
+  function setGameInterval() {
+    if (interval) clearInterval(interval);
+    interval = setInterval(() => {
+      move();
+    }, intervalTime);
   }
 
   function updateScore(nextScore = null) {
@@ -53,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
       (direction === LEFT && nextHead % WIDTH === WIDTH - 1) ||
       squares[nextHead].classList.contains("snake")
     ) {
-      return stop();
+      return endGame();
     }
 
     currentSnake.unshift(nextHead);
@@ -81,6 +99,8 @@ document.addEventListener("DOMContentLoaded", () => {
       currentSnake.push(tail);
       updateScore();
       randomApple();
+      intervalTime *= speed;
+      setGameInterval();
     }
   }
 
