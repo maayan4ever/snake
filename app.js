@@ -6,7 +6,7 @@ const DOWN = WIDTH;
 
 document.addEventListener("DOMContentLoaded", () => {
   const squares = document.querySelectorAll(".grid div");
-  const scoreDisplay = document.querySelector("span");
+  const scoreDisplay = document.querySelector(".score span");
   const startBtn = document.querySelector(".start");
 
   let currentSnake = [2, 1, 0];
@@ -14,11 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let direction = 1;
   let intervalTime = 1000;
   let interval = 0;
+  let score = 0;
 
   function clearGame() {
     currentSnake.forEach((index) => squares[index].classList.remove("snake"));
     currentSnake = [2, 1, 0];
     squares[appleIndex].classList.remove("apple");
+    updateScore(0);
     stop();
   }
 
@@ -33,6 +35,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function stop() {
     if (interval) clearInterval(interval);
+  }
+
+  function updateScore(nextScore = null) {
+    nextScore !== null ? (score = nextScore) : (score += 1);
+    scoreDisplay.textContent = score;
   }
 
   function move() {
@@ -72,6 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
       squares[currentSnake[0]].classList.remove("apple");
       squares[tail].classList.add("snake");
       currentSnake.push(tail);
+      updateScore();
       randomApple();
     }
   }
