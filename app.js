@@ -16,9 +16,18 @@ const DEFAULT_INTERVAL_TIME = 800;
 // 5. Add a high scores list
 
 document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener(
+    "touchmove",
+    function (e) {
+      e.preventDefault(); // prevent scrolling when inside DIV
+    },
+    false
+  );
+
   const squares = document.querySelectorAll(".grid div");
   const scoreDisplay = document.querySelector(".score span");
   const startBtn = document.querySelector(".start");
+  const moveBtns = document.querySelectorAll(".move-buttons button");
 
   let currentSnake, direction, intervalTime;
   let appleIndex = 0;
@@ -28,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function clearGame() {
     currentSnake = [...DEFAULT_SNAKE];
-    direction = DEFAULT_DIRECTION;
+    changeDirection(DEFAULT_DIRECTION);
     squares.forEach((sq) => sq.classList.remove("snake", "apple"));
     console.log("clearGame", currentSnake, direction);
     intervalTime = DEFAULT_INTERVAL_TIME;
@@ -68,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function move() {
     let nextHead = currentSnake[0] + direction;
     if (nextHead === currentSnake[1]) {
-      direction = -direction;
+      changeDirection(-direction);
       nextHead = currentSnake[0] + direction;
     }
     const tail = currentSnake.pop();
@@ -90,15 +99,43 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function control(event) {
-    if (event.keyCode === 39) {
-      direction = RIGHT;
-    } else if (event.keyCode === 37) {
-      direction = LEFT;
-    } else if (event.keyCode === 38) {
-      direction = UP;
-    } else if (event.keyCode === 40) {
-      direction = DOWN;
+    if (event.keyCode === 39 || event.target.id === "right") {
+      changeDirection(RIGHT);
+    } else if (event.keyCode === 37 || event.target.id === "left") {
+      changeDirection(LEFT);
+    } else if (event.keyCode === 38 || event.target.id === "up") {
+      changeDirection(UP);
+    } else if (event.keyCode === 40 || event.target.id === "down") {
+      changeDirection(DOWN);
     }
+  }
+
+  function changeDirection(dir) {
+    let directionText;
+    switch (dir) {
+      case UP:
+        directionText = "up";
+        break;
+      case DOWN:
+        directionText = "down";
+        break;
+      case LEFT:
+        directionText = "left";
+        break;
+      case RIGHT:
+        directionText = "right";
+        break;
+    }
+    direction = dir;
+    markButtonAsActive(directionText);
+  }
+
+  function markButtonAsActive(selected) {
+    moveBtns.forEach((btn) =>
+      btn.id === selected
+        ? btn.classList.add("active")
+        : btn.classList.remove("active")
+    );
   }
 
   function handleEatingApple(tail) {
@@ -119,7 +156,9 @@ document.addEventListener("DOMContentLoaded", () => {
     } while (squares[appleIndex].classList.contains("snake"));
     squares[appleIndex].classList.add("apple");
   }
-
   startBtn.addEventListener("click", startGame);
+  moveBtns.forEach((btn) => {
+    btn.addEventListener("click", control);
+  });
   document.addEventListener("keyup", control);
 });
