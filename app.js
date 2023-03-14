@@ -4,10 +4,14 @@ const LEFT = -1;
 const UP = -WIDTH;
 const DOWN = WIDTH;
 
+const DEFAULT_SNAKE = [2, 1, 0];
+const DEFAULT_DIRECTION = 1;
+const DEFAULT_INTERVAL_TIME = 800;
+
 // TODO:
 // 1. Show the game over on the screen
 // 2. Deploy the game on the web
-// 3. Adapt the game to mobile devices
+// 3. Adapt the game to mobile devices - responsive design & touch events
 // 4. Add some sound effects
 // 5. Add a high scores list
 
@@ -16,17 +20,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const scoreDisplay = document.querySelector(".score span");
   const startBtn = document.querySelector(".start");
 
-  let currentSnake = [2, 1, 0];
+  let currentSnake, direction, intervalTime;
   let appleIndex = 0;
-  let direction = 1;
-  let intervalTime = 800;
   let speed = 0.9;
   let interval = 0;
   let score = 0;
 
   function clearGame() {
-    currentSnake.forEach((index) => squares[index].classList.remove("snake"));
-    currentSnake = [2, 1, 0];
+    currentSnake = [...DEFAULT_SNAKE];
+    direction = DEFAULT_DIRECTION;
+    squares.forEach((sq) => sq.classList.remove("snake", "apple"));
+    console.log("clearGame", currentSnake, direction);
+    intervalTime = DEFAULT_INTERVAL_TIME;
     squares[appleIndex].classList.remove("apple");
     updateScore(0);
     stop();
@@ -61,9 +66,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function move() {
+    let nextHead = currentSnake[0] + direction;
+    if (nextHead === currentSnake[1]) {
+      direction = -direction;
+      nextHead = currentSnake[0] + direction;
+    }
     const tail = currentSnake.pop();
     squares[tail].classList.remove("snake");
-    const nextHead = currentSnake[0] + direction;
     if (
       nextHead < 0 ||
       nextHead >= WIDTH * WIDTH ||
